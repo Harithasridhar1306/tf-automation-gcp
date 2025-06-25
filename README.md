@@ -23,17 +23,17 @@ A DevOps automation tool to provision Google Cloud resources using Terraform thr
 
 ##  Project Structure
 
-.
-├── infracli.py # Main Python CLI script
-├── terraform-gcp-creds.json # GCP service account (or dummy JSON)
-├── infra/
-│ ├── main.tf # VPC logic
-│ ├── variables.tf
-│ └── terraform.tfvars.json # auto-generated
-│
-└── infra/enable_service/
-├── main.tf # API enabling logic
-├── variables.tf
-└── terraform.tfvars.json # auto-generated
-
+                                      .
+                                      ├── infracli.py # Main Python CLI script
+                                      ├── terraform-gcp-creds.json # GCP service account (or dummy JSON)
+                                      ├── infra/
+                                      │ ├── main.tf # VPC logic
+                                      │ ├── variables.tf
+                                      │ └── terraform.tfvars.json # auto-generated
+                                      │
+                                      └── infra/enable_service/
+                                      ├── main.tf # API enabling logic
+                                      ├── variables.tf
+                                      └── terraform.tfvars.json # auto-generated
+                                      
 
