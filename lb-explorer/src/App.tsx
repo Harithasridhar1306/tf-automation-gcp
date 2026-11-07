@@ -39,7 +39,7 @@ const affinities=[
 const backends=['backend-a · zone-a','backend-b · zone-b','backend-c · zone-c']
 function App(){
  const [family,setFamily]=useState<Family>('application')
- const [lbId,setLbId]=useState('ag')
+ const [lbId,setLbId]=useState('ar')
  const [tab,setTab]=useState('traffic')
  const [running,setRunning]=useState(false)
  const [requestNo,setRequestNo]=useState(0)
