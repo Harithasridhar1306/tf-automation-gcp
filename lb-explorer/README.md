@@ -1,14 +1,25 @@
 # GCP Load Balancer Explorer
 
-An interactive, browser-based learning lab for understanding the request path through a **global external Google Cloud Application Load Balancer**.
+An interactive learning lab for Google Cloud Load Balancing, hosted with GitHub Pages.
 
-## What is included
+## Experiences
 
-- Clickable request-flow architecture: client, frontend IP, forwarding rule, target HTTPS proxy, URL map, backend service, health check, and backend workload.
-- Component inspector with responsibilities, common failure modes, and first troubleshooting checks.
-- Break & debug incident scenarios for timeouts, unhealthy backends, incorrect URL routing, and HTTPS certificate errors.
-- A knowledge-check question with an explanation.
-- No GCP project, credentials, or cloud resources are required. The lab is a conceptual simulator.
+- **Load Balancer simulator** — compare Application, proxy Network and passthrough Network Load Balancers; simulate request traffic, backend policies, session affinity and failure scenarios.
+- **Application Load Balancer Explorer** — a guided, step-by-step ALB learning experience with a clickable resource chain, component inspector, global-vs-regional proxy architecture, request simulator, backend failure toggles, incident workbench and knowledge checks.
+
+## Open the learning experiences
+
+- Main multi-load-balancer simulator: https://harithasridhar1306.github.io/tf-automation-gcp/
+- Guided Application Load Balancer Explorer: https://harithasridhar1306.github.io/tf-automation-gcp/alb.html
+
+## ALB Explorer topics
+
+- Client/DNS → forwarding rule → target proxy → URL map → backend service → NEG → endpoint.
+- Global external ALB (GFE) versus regional external ALB (Envoy and proxy-only subnet).
+- Separate client-to-proxy and proxy-to-backend connections.
+- Backend firewall source versus frontend VIP.
+- Health checks as a separate probe path, not a user-request hop.
+- Host/path routing, backend selection, endpoint health and troubleshooting.
 
 ## Run locally
 
@@ -18,31 +29,23 @@ npm install
 npm run dev
 ```
 
-## Build
+The default Vite dev server opens the main simulator. Visit `/alb.html` for the guided ALB experience.
+
+## Build and test
 
 ```bash
 npm run build
 npm run preview
 ```
 
-## GitHub Pages
+The GitHub Actions workflow builds both pages and deploys the generated `dist/` directory to GitHub Pages. The build is also run for pull requests touching `lb-explorer/**`.
 
-The site is built from `lb-explorer/` and deployed to the repository's GitHub Pages root.
+## Scope and accuracy
 
-1. Merge the explorer into `main`.
-2. In GitHub, open **Settings → Pages**.
-3. Set **Build and deployment → Source** to **GitHub Actions**.
-4. Run the **Deploy GCP Load Balancer Explorer** workflow (or push a later change under `lb-explorer/`).
-5. The site will be published at:
+This is a conceptual browser simulator. It does not provision GCP resources, make requests to a live GCP project, or require cloud credentials. The traffic generator and incident scenarios are teaching simulations.
 
-   https://harithasridhar1306.github.io/tf-automation-gcp/
+The global and regional external ALB modes are intentionally shown separately. For regional external ALBs, Envoy proxies use addresses from the proxy-only subnet for backend connections. That subnet is not a router and is not an intermediate hop traversed by the client's original packet. Health checks are separate probes. Always verify firewall source ranges and feature support against the exact load-balancer product and backend type in the official Google Cloud documentation.
 
-The existing Python CLI and Terraform infrastructure at the repository root are kept separate and unchanged.
+## Stack
 
-## Important scope
-
-This first version teaches the global external Application Load Balancer request path. Regional/internal Application Load Balancers and proxy or passthrough Network Load Balancers have different resource models, traffic paths, and firewall requirements; they should be added as separate learning modules rather than treated as identical.
-
-## Tech stack
-
-React · TypeScript · Vite · GitHub Actions · GitHub Pages
+React · TypeScript · Vite · Lucide · GitHub Actions · GitHub Pages
