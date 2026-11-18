@@ -57,14 +57,12 @@ function App() {
   const [showDiagnosis,setShowDiagnosis] = useState(false)
   const [quizAnswers,setQuizAnswers] = useState<Record<number,number>>({})
   const [quizSubmitted,setQuizSubmitted] = useState(false)
-  const [journeyIndex,setJourneyIndex] = useState(0)
 
   const selected = steps.find(s=>s.id===active) ?? steps[1]
   const selectedScenario = scenarios.find(s=>s.id===scenario) ?? scenarios[0]
   const apiHealthy = apiBackends.filter(b=>!failed.includes(b))
   const webHealthy = webBackends.filter(b=>!failed.includes(b))
   const routedPool = path.startsWith('/api') ? apiHealthy : webHealthy
-  const currentPool = routedPool.length ? routedPool : (path.startsWith('/api') ? apiBackends : webBackends)
   const activeStepIndex = steps.findIndex(s=>s.id===active)
   const quizScore = quiz.reduce((n,q,i)=>n+(quizAnswers[i]===q.answer?1:0),0)
 
@@ -83,6 +81,31 @@ function App() {
     const status = pool.length ? '200 OK' : '503 · no healthy endpoints'
     const entry:RequestLog = {id:n,path,backend:pool.length?backend:'No eligible backend',status,mode,time:new Date().toLocaleTimeString()}
     setLogs(prev=>[entry,...prev].slice(0,8))
+    setActive('endpoint')
+  }
+
+  function sendFiveRequests() {
+    const start = counter
+    let nextApi = apiCursor
+    let nextWeb = webCursor
+    const batch:RequestLog[] = []
+    for (let i=0;i<5;i++) {
+      const n = start + i + 1
+      const isApi = path.startsWith('/api')
+      const configured = isApi ? apiBackends : webBackends
+      const pool = configured.filter(b=>!failed.includes(b))
+      const usable = pool.length ? pool : configured
+      const cursor = isApi ? nextApi : nextWeb
+      const backend = policy === 'ROUND_ROBIN'
+        ? usable[cursor % usable.length]
+        : usable[(host.length + path.length + (affinity==='NONE'?n:host.length)) % usable.length]
+      if (isApi) nextApi++; else nextWeb++
+      batch.push({id:n,path,backend:pool.length?backend:'No eligible backend',status:pool.length?'200 OK':'503 · no healthy endpoints',mode,time:new Date().toLocaleTimeString()})
+    }
+    setCounter(start+5)
+    setApiCursor(nextApi)
+    setWebCursor(nextWeb)
+    setLogs(prev=>[...batch.reverse(),...prev].slice(0,8))
     setActive('endpoint')
   }
 
@@ -165,7 +188,7 @@ function App() {
               <label>SESSION AFFINITY<select value={affinity} onChange={e=>setAffinity(e.target.value)}><option value="NONE">None</option><option value="GENERATED_COOKIE">Generated cookie</option><option value="CLIENT_IP">Client IP</option></select></label>
             </div>
             {affinity==='GENERATED_COOKIE' && <div className="alb-cookie-control"><div><b>Generated cookie TTL</b><small>{cookieTtl===0?'Session cookie':cookieTtl+' seconds'} · simplified illustration</small></div><input type="range" min="0" max="604800" step="300" value={cookieTtl} onChange={e=>setCookieTtl(Number(e.target.value))}/><code>{mode==='global'?'GCLB':'GCILB'}=demo-session; Path=/{cookieTtl?'; Max-Age='+cookieTtl:''}</code></div>}
-            <div className="alb-send-row"><button className="alb-primary" onClick={sendRequest}><Play size={15} fill="currentColor"/> Send request</button><button className="alb-secondary" onClick={()=>{for(let i=0;i<5;i++) sendRequest()}}>Send 5 requests</button><button className="alb-ghost" onClick={resetLab}><RotateCcw size={14}/> Reset lab</button></div>
+            <div className="alb-send-row"><button className="alb-primary" onClick={sendRequest}><Play size={15} fill="currentColor"/> Send request</button><button className="alb-secondary" onClick={sendFiveRequests}>Send 5 requests</button><button className="alb-ghost" onClick={resetLab}><RotateCcw size={14}/> Reset lab</button></div>
             <div className="alb-packet-track">
               <div className="alb-packet-track-head"><b>LIVE REQUEST TRACE</b><span>REQUEST #{String(counter).padStart(3,'0')}</span></div>
               <div className="alb-track-nodes">
