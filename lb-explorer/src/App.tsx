@@ -66,7 +66,7 @@ function App(){
  const ttlText=ttl===0?'Session cookie · 0 seconds':ttl>=86400?(ttl/86400)+' days · '+ttl.toLocaleString()+'s':ttl>=3600?(ttl/3600).toFixed(1)+' hours · '+ttl+'s':ttl>=60?Math.round(ttl/60)+' minutes · '+ttl+'s':ttl+' seconds'
  const selectFamily=(f:Family)=>{setFamily(f);setLbId(lbs.find(x=>x.family===f)!.id);setRunning(false)}
  const send=()=>{setRequestNo(n=>n+1);setRunning(true);window.setTimeout(()=>setRunning(false),2200)}
- return <div className="site">
+ return <div className="site"><a className="alb-journey-banner" href="./alb.html">Explore the guided ALB learning journey <ArrowRight size={14}/></a>
  <header className="header"><a className="logo" href="#"><span className="logo-icon"><Network size={19}/></span><span>GCP <b>LB LAB</b><small>PACKETS IN MOTION</small></span></a><div className="header-right"><span className="live"><i/> SIMULATED ENVIRONMENT</span><a href="https://github.com/Harithasridhar1306/tf-automation-gcp" target="_blank" rel="noreferrer">SOURCE <ArrowRight size={13}/></a></div></header>
  <main>
  <section className="intro"><div className="eyebrow"><Sparkles size={13}/> CLOUD NETWORKING · INTERACTIVE SIMULATOR</div><h1>Load balancing, <em>in motion.</em></h1><p>Pick a Google Cloud load balancer. Watch packets travel through its architecture, then change backend policies and see how traffic distribution and session affinity behave.</p><div className="intro-stats"><span><b>3</b> LB families</span><span><b>13</b> deployment types</span><span><b>L4 + L7</b> traffic paths</span></div></section>
